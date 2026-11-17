@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Mina Microphone</title>
+
+  <style>
+    body {
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px 15px;
+    }
+
+    h1 {
+      color: #62d9ff;
+    }
+
+    button {
+      background: #16a6d5;
+      color: white;
+      border: none;
+      padding: 16px 24px;
+      border-radius: 25px;
+      font-size: 18px;
+      margin: 15px;
+      cursor: pointer;
+    }
+
+    #status {
+      color: #62d9ff;
+      margin: 25px;
+    }
+
+    #result {
+      background: #23334b;
+      padding: 18px;
+      border-radius: 12px;
+      min-height: 50px;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>MINA AI</h1>
+  <p>Microphone Connection</p>
+
+  <div id="status">Ready to talk</div>
+
+  <button onclick="startListening()">
+    🎤 Start Microphone
+  </button>
+
+  <div id="result">
+    Your voice will appear here.
+  </div>
+
+  <script>
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    let mic = null;
+
+    if (SpeechRecognition) {
+      mic = new SpeechRecognition();
+      mic.lang = "bn-BD";
+      mic.continuous = false;
+      mic.interimResults = false;
+
+      mic.onstart = function() {
+        document.getElementById("status").innerText =
+          "Listening...";
+      };
+
+      mic.onresult = function(event) {
+        const message =
+          event.results[0][0].transcript;
+
+        document.getElementById("result").innerText =
+          message;
+
+        document.getElementById("status").innerText =
+          "Voice captured!";
+
+        if (window.opener) {
+          window.opener.postMessage({
+            type: "MINA_TRANSCRIPT",
+            text: message
+          }, "*");
+        } else {
+          document.getElementById("status").innerText =
+            "Voice captured. Open this page from Mina.";
+        }
+      };
+
+      mic.onerror = function(event) {
+        document.getElementById("status").innerText =
+          "Microphone error: " + event.error;
+      };
+
+      mic.onend = function() {
+        if (
+          document.getElementById("status").innerText ===
+          "Listening..."
+        ) {
+          document.getElementById("status").innerText =
+            "Ready to talk";
+        }
+      };
+    }
+
+    function startListening() {
+      if (!mic) {
+        document.getElementById("status").innerText =
+          "Voice recognition is not supported.";
+        return;
+      }
+
+      try {
+        mic.start();
+      } catch (error) {
+        document.getElementById("status").innerText =
+          "Please try again.";
+      }
+    }
+  </script>
+
+</body>
+</html>
