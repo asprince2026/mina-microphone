@@ -2,135 +2,646 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101827">
-  <title>Mina Microphone</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>Mina - AI Personal Assistant</title>
 
-  <style>
-    body {
-      background: #101827;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 30px 15px;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    h1 {
-      color: #62d9ff;
-    }
+body {
+  margin: 0;
+  background: #101827;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
 
-    button {
-      background: #16a6d5;
-      color: white;
-      border: none;
-      padding: 16px 24px;
-      border-radius: 25px;
-      font-size: 18px;
-      margin: 15px;
-      cursor: pointer;
-    }
+.app {
+  width: 100%;
+  max-width: 750px;
+  margin: auto;
+  padding: 20px;
+}
 
-    #status {
-      color: #62d9ff;
-      margin: 25px;
-    }
+header {
+  text-align: center;
+  padding: 25px 10px;
+}
 
-    #result {
-      background: #23334b;
-      padding: 18px;
-      border-radius: 12px;
-      min-height: 50px;
-      overflow-wrap: anywhere;
-    }
-  </style>
+.logo {
+  width: 75px;
+  height: 75px;
+  margin: auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#7c3aed,#06b6d4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+}
+
+h1 {
+  margin-bottom: 5px;
+  font-size: 30px;
+}
+
+.subtitle {
+  color: #aab7ca;
+  font-size: 14px;
+}
+
+.status {
+  color: #38d9a9;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.chat {
+  background: #182438;
+  border: 1px solid #2d405b;
+  border-radius: 16px;
+  padding: 15px;
+  min-height: 350px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.message {
+  padding: 13px 15px;
+  border-radius: 13px;
+  margin: 12px 0;
+  max-width: 90%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
+.mina {
+  background: #263b56;
+  margin-right: auto;
+}
+
+.user {
+  background: #5940a8;
+  margin-left: auto;
+}
+
+.controls {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #40516b;
+  background: #1c2a3e;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-size: 16px;
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.send {
+  background: #6848d8;
+}
+
+.mic-area {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.mic {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  font-size: 30px;
+  background: linear-gradient(135deg,#7c3aed,#2563eb);
+  box-shadow: 0 0 25px #6848d855;
+}
+
+.mic.listening {
+  background: #dc3545;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 30px #ff4d4d;
+  }
+}
+
+.mic-label {
+  color: #aab7ca;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.options {
+  text-align: center;
+  margin-top: 20px;
+  color: #b9c5d6;
+  font-size: 14px;
+}
+
+.options label {
+  cursor: pointer;
+}
+
+footer {
+  text-align: center;
+  color: #718096;
+  font-size: 12px;
+  padding: 25px;
+}
+
+@media(max-width:480px) {
+  .app {
+    padding: 12px;
+  }
+
+  .controls {
+    gap: 6px;
+  }
+
+  .controls button {
+    padding: 12px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <h1>MINA AI</h1>
-  <p>Microphone Connection</p>
+<div class="app">
 
-  <div id="status">Ready to talk</div>
+<header>
+  <div class="logo">🎙️</div>
+  <h1>Mina</h1>
+  <div class="subtitle">Your Personal AI Voice Assistant</div>
+  <div class="status" id="status">● Mina is ready</div>
+</header>
 
-  <button onclick="startListening()">
-    🎤 Start Microphone
-  </button>
-
-  <div id="result">
-    Your voice will appear here.
+<div class="chat" id="chat">
+  <div class="message mina">
+    আসসালামু আলাইকুম! আমি মিনা। 😊
+    বলুন, আমি আপনাকে কীভাবে সাহায্য করতে পারি?
   </div>
+</div>
 
-  <script>
-    const SpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
+<div class="controls">
+  <input
+    id="message"
+    type="text"
+    placeholder="এখানে লিখুন..."
+    autocomplete="off"
+  >
+  <button class="send" id="sendBtn" onclick="sendText()">
+    Send
+  </button>
+</div>
 
-    let mic = null;
+<div class="mic-area">
+  <button class="mic" id="micBtn" onclick="toggleMic()">
+    🎤
+  </button>
+  <div class="mic-label" id="micLabel">
+    কথা বলতে মাইক্রোফোন চাপুন
+  </div>
+</div>
 
-    if (SpeechRecognition) {
-      mic = new SpeechRecognition();
-      mic.lang = "bn-BD";
-      mic.continuous = false;
-      mic.interimResults = false;
+<div class="options">
+  <label>
+    <input type="checkbox" id="voiceEnabled" checked>
+    Mina-এর Voice চালু রাখুন
+  </label>
+</div>
 
-      mic.onstart = function() {
-        document.getElementById("status").innerText =
-          "Listening...";
-      };
+<footer>
+  Mina AI Assistant
+</footer>
 
-      mic.onresult = function(event) {
-        const message =
-          event.results[0][0].transcript;
+</div>
 
-        document.getElementById("result").innerText =
-          message;
+<script>
 
-        document.getElementById("status").innerText =
-          "Voice captured!";
+// ==================================
+// MINA BACKEND CONNECTION
+// ==================================
 
-        if (window.opener) {
-          window.opener.postMessage({
-            type: "MINA_TRANSCRIPT",
-            text: message
-          }, "*");
-        } else {
-          document.getElementById("status").innerText =
-            "Voice captured. Open this page from Mina.";
-        }
-      };
+const BACKEND_URL =
+"https://script.google.com/macros/s/AKfycbzxlPQWuomzcvUG7E9tJljr6r-8arnygvA6HNFgTSOxB83Q_O6m-dX_KIu6e0w-9oX87Q/exec";
 
-      mic.onerror = function(event) {
-        document.getElementById("status").innerText =
-          "Microphone error: " + event.error;
-      };
+const chat = document.getElementById("chat");
+const input = document.getElementById("message");
+const statusText = document.getElementById("status");
+const sendBtn = document.getElementById("sendBtn");
+const micBtn = document.getElementById("micBtn");
+const micLabel = document.getElementById("micLabel");
 
-      mic.onend = function() {
-        if (
-          document.getElementById("status").innerText ===
-          "Listening..."
-        ) {
-          document.getElementById("status").innerText =
-            "Ready to talk";
-        }
-      };
+let busy = false;
+let recognition = null;
+let listening = false;
+let finalTranscript = "";
+
+function setStatus(message) {
+  statusText.textContent = "● " + message;
+}
+
+function addMessage(message, type) {
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = message;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function setBusy(value) {
+  busy = value;
+  sendBtn.disabled = value;
+  input.disabled = value;
+  setStatus(value ? "Mina is thinking..." : "Mina is ready");
+}
+
+
+// ==================================
+// JSONP CONNECTION TO APPS SCRIPT
+// ==================================
+
+let requestResolve = null;
+let requestReject = null;
+let requestTimer = null;
+let requestScript = null;
+
+function cleanRequest() {
+  clearTimeout(requestTimer);
+
+  if (requestScript) {
+    requestScript.remove();
+    requestScript = null;
+  }
+}
+
+window.minaCallback = function(data) {
+
+  if (!requestResolve) return;
+
+  const resolve = requestResolve;
+
+  requestResolve = null;
+  requestReject = null;
+
+  cleanRequest();
+  resolve(data);
+};
+
+function askMina(message) {
+
+  return new Promise((resolve, reject) => {
+
+    if (requestResolve) {
+      reject(new Error("একটি অনুরোধ ইতিমধ্যে চলছে"));
+      return;
     }
 
-    function startListening() {
-      if (!mic) {
-        document.getElementById("status").innerText =
-          "Voice recognition is not supported.";
-        return;
+    requestResolve = resolve;
+    requestReject = reject;
+
+    const params = new URLSearchParams({
+      action: "chat",
+      callback: "minaCallback",
+      message: message,
+      _: Date.now().toString()
+    });
+
+    requestScript = document.createElement("script");
+
+    requestScript.src =
+      BACKEND_URL + "?" + params.toString();
+
+    requestScript.onerror = function() {
+
+      if (!requestReject) return;
+
+      const fail = requestReject;
+
+      requestResolve = null;
+      requestReject = null;
+
+      cleanRequest();
+
+      fail(new Error("Backend connection failed"));
+
+    };
+
+    requestTimer = setTimeout(() => {
+
+      if (!requestReject) return;
+
+      const fail = requestReject;
+
+      requestResolve = null;
+      requestReject = null;
+
+      cleanRequest();
+
+      fail(new Error("Mina response timeout"));
+
+    }, 45000);
+
+    document.body.appendChild(requestScript);
+
+  });
+
+}
+
+
+// ==================================
+// SEND MESSAGE
+// ==================================
+
+async function sendMessage(message) {
+
+  message = message.trim();
+
+  if (!message || busy) return;
+
+  addMessage(message, "user");
+
+  input.value = "";
+
+  setBusy(true);
+
+  try {
+
+    const result = await askMina(message);
+
+    if (!result || !result.ok) {
+      throw new Error(
+        result && result.reply
+          ? result.reply
+          : "Mina could not reply"
+      );
+    }
+
+    const reply = result.reply;
+
+    addMessage(reply, "mina");
+
+    if (document.getElementById("voiceEnabled").checked) {
+      speak(reply);
+    }
+
+  } catch (error) {
+
+    addMessage(
+      "দুঃখিত, সমস্যা হয়েছে: " + error.message,
+      "mina"
+    );
+
+  } finally {
+
+    setBusy(false);
+
+  }
+
+}
+
+function sendText() {
+  sendMessage(input.value);
+}
+
+input.addEventListener("keydown", function(event) {
+
+  if (event.key === "Enter") {
+    sendText();
+  }
+
+});
+
+
+// ==================================
+// MINA BENGALI VOICE
+// ==================================
+
+function speak(message) {
+
+  if (!("speechSynthesis" in window)) {
+    setStatus("Voice is not supported");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance =
+    new SpeechSynthesisUtterance(message);
+
+  utterance.lang = "bn-BD";
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+
+  const voices = window.speechSynthesis.getVoices();
+
+  const bengaliVoice = voices.find(voice =>
+    voice.lang.toLowerCase().startsWith("bn")
+  );
+
+  if (bengaliVoice) {
+    utterance.voice = bengaliVoice;
+  }
+
+  utterance.onstart = function() {
+    setStatus("Mina is speaking...");
+  };
+
+  utterance.onend = function() {
+    if (!busy) setStatus("Mina is ready");
+  };
+
+  utterance.onerror = function() {
+    if (!busy) setStatus("Voice playback unavailable");
+  };
+
+  window.speechSynthesis.speak(utterance);
+
+}
+
+
+// ==================================
+// MICROPHONE / SPEECH RECOGNITION
+// ==================================
+
+const SpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+
+  recognition = new SpeechRecognition();
+
+  recognition.lang = "bn-BD";
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = function() {
+
+    listening = true;
+
+    micBtn.classList.add("listening");
+    micBtn.textContent = "⏹️";
+
+    micLabel.textContent = "মিনা আপনার কথা শুনছে...";
+
+    setStatus("Listening...");
+
+  };
+
+  recognition.onresult = function(event) {
+
+    let interim = "";
+
+    for (
+      let i = event.resultIndex;
+      i < event.results.length;
+      i++
+    ) {
+
+      const transcript = event.results[i][0].transcript;
+
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript + " ";
+      } else {
+        interim += transcript;
       }
 
-      try {
-        mic.start();
-      } catch (error) {
-        document.getElementById("status").innerText =
-          "Please try again.";
-      }
     }
-  </script>
+
+    input.value = finalTranscript + interim;
+
+  };
+
+  recognition.onerror = function(event) {
+
+    const errors = {
+      "not-allowed": "মাইক্রোফোনের অনুমতি দিন",
+      "service-not-allowed": "Speech service অনুমোদিত নয়",
+      "no-speech": "কোনো কথা শোনা যায়নি",
+      "audio-capture": "মাইক্রোফোন পাওয়া যাচ্ছে না",
+      "network": "Speech recognition network error"
+    };
+
+    micLabel.textContent =
+      errors[event.error] || "মাইক্রোফোনে সমস্যা হয়েছে";
+
+  };
+
+  recognition.onend = function() {
+
+    listening = false;
+
+    micBtn.classList.remove("listening");
+    micBtn.textContent = "🎤";
+
+    const message = finalTranscript.trim();
+
+    finalTranscript = "";
+
+    if (message) {
+
+      micLabel.textContent = "আপনার কথা পাঠানো হচ্ছে...";
+
+      sendMessage(message);
+
+    } else {
+
+      micLabel.textContent = "কথা বলতে মাইক্রোফোন চাপুন";
+
+      if (!busy) setStatus("Mina is ready");
+
+    }
+
+  };
+
+} else {
+
+  micLabel.textContent =
+    "আপনার Browser Speech Recognition সমর্থন করে না";
+
+  micBtn.disabled = true;
+
+}
+
+
+// ==================================
+// MICROPHONE BUTTON
+// ==================================
+
+function toggleMic() {
+
+  if (!recognition) {
+    alert("এই Browser-এ Speech Recognition সমর্থিত নয়। Chrome ব্যবহার করুন।");
+    return;
+  }
+
+  if (busy) return;
+
+  if (listening) {
+
+    recognition.stop();
+
+  } else {
+
+    finalTranscript = "";
+
+    input.value = "";
+
+    try {
+
+      recognition.start();
+
+    } catch (error) {
+
+      micLabel.textContent =
+        "মাইক্রোফোন চালু করা যায়নি। আবার চেষ্টা করুন।";
+
+    }
+
+  }
+
+}
+
+
+// ==================================
+// LOAD AVAILABLE VOICES
+// ==================================
+
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = function() {
+    window.speechSynthesis.getVoices();
+  };
+}
+
+</script>
 
 </body>
 </html>
